@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#200910">
+  <meta name="description" content="Un calendario de Adviento hecho a mano, con 24 pequeños regalos de amor para ti.">
+  <title>Un diciembre hecho de nosotros · Calendario de Adviento</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       01 · BASE Y PALETA
+       ========================================================= */
+    :root {
+      --wine-950: #18060c;
+      --wine-900: #210910;
+      --wine-800: #34101c;
+      --wine-700: #4b1726;
+      --wine-600: #672137;
+      --gold: #d7b579;
+      --gold-soft: #f0ddb8;
+      --gold-deep: #9d713c;
+      --cream: #f9f1e5;
+      --cream-deep: #efdfc8;
+      --forest: #183a2d;
+      --forest-deep: #0d271e;
+      --ink: #4d3638;
+      --ink-soft: #755f5e;
+      --font-serif: "Playfair Display", Georgia, serif;
+      --font-sans: "Poppins", "Segoe UI", sans-serif;
+      --shadow-deep: 0 30px 70px -35px rgba(0, 0, 0, .9);
+      --ease-soft: cubic-bezier(.2, .75, .2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--wine-950);
+      color: var(--cream);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.modal-open { overflow: hidden; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    ::selection { color: var(--wine-950); background: var(--gold); }
+    :focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 4px; }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0);
+      white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: fixed; top: 12px; left: 12px; z-index: 2000;
+      padding: 10px 16px; border-radius: 999px;
+      color: var(--wine-900); background: var(--gold-soft);
+      font-size: .8rem; font-weight: 500; text-decoration: none;
+      transform: translateY(-160%);
+      transition: transform .2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    /* =========================================================
+       02 · ATMÓSFERA INVERNAL
+       ========================================================= */
+    .scene {
+      position: fixed; inset: 0; z-index: -3; overflow: hidden;
+      background:
+        radial-gradient(1100px 650px at 50% -12%, rgba(155, 90, 71, .22), transparent 62%),
+        radial-gradient(750px 700px at 6% 48%, rgba(31, 80, 59, .24), transparent 70%),
+        radial-gradient(850px 700px at 102% 88%, rgba(118, 41, 60, .22), transparent 72%),
+        linear-gradient(180deg, #19070d 0%, #260b14 43%, #1b0710 100%);
+    }
+    .scene::before {
+      content: "";
+      position: absolute; inset: 0;
+      opacity: .34;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(248, 231, 202, .8), transparent),
+        radial-gradient(1.5px 1.5px at 78% 9%, rgba(231, 198, 139, .7), transparent),
+        radial-gradient(1px 1px at 94% 33%, rgba(255, 255, 255, .55), transparent),
+        radial-gradient(1px 1px at 38% 7%, rgba(255, 255, 255, .55), transparent),
+        radial-gradient(1.5px 1.5px at 63% 29%, rgba(236, 206, 157, .55), transparent),
+        radial-gradient(1px 1px at 23% 47%, rgba(255, 255, 255, .4), transparent),
+        radial-gradient(1px 1px at 86% 67%, rgba(255, 255, 255, .4), transparent),
+        radial-gradient(1.5px 1.5px at 5% 78%, rgba(216, 180, 119, .4), transparent);
+    }
+    .scene::after {
+      content: "";
+      position: absolute;
+      width: min(80vw, 880px); aspect-ratio: 1;
+      left: 50%; top: 9%;
+      border: 1px solid rgba(216, 180, 119, .07);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow:
+        0 0 0 70px rgba(216, 180, 119, .018),
+        0 0 0 150px rgba(216, 180, 119, .014);
+    }
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); pointer-events: none;
+      animation: orbDrift 24s ease-in-out infinite alternate;
+    }
+    .orb--one { width: 460px; height: 460px; top: -190px; left: -130px; background: rgba(132, 51, 68, .3); }
+    .orb--two { width: 390px; height: 390px; top: 42%; right: -170px; background: rgba(35, 91, 67, .24); animation-delay: -8s; }
+    .orb--three { width: 260px; height: 260px; bottom: 3%; left: 18%; background: rgba(198, 148, 83, .09); animation-delay: -15s; }
+    @keyframes orbDrift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(30px, -24px, 0) scale(1.08); }
+    }
+
+    #snow {
+      position: fixed; inset: 0; z-index: 6;
+      width: 100%; height: 100%;
+      pointer-events: none; opacity: .58;
+    }
+    .grain {
+      position: fixed; inset: 0; z-index: 8; pointer-events: none;
+      opacity: .035; mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+    }
+
+    /* =========================================================
+       03 · CABECERA
+       ========================================================= */
+    .site-header {
+      position: relative; z-index: 20;
+      width: min(1240px, calc(100% - 64px));
+      margin: 0 auto; padding-top: 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 12px;
+      color: var(--cream); text-decoration: none;
+    }
+    .brand__seal {
+      position: relative; display: grid; place-items: center;
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(216, 180, 119, .5);
+      background: rgba(255, 255, 255, .025);
+      color: var(--gold-soft);
+    }
+    .brand__seal::after {
+      content: ""; position: absolute; inset: 5px;
+      border: 1px solid rgba(216, 180, 119, .2); border-radius: inherit;
+    }
+    .brand__seal svg { width: 16px; height: 16px; }
+    .brand__copy { display: flex; flex-direction: column; line-height: 1.25; }
+    .brand__name {
+      font-family: var(--font-serif); font-size: 1.12rem;
+      font-weight: 500; letter-spacing: .015em;
+    }
+    .brand__tag {
+      margin-top: 2px; color: rgba(240, 221, 184, .58);
+      font-size: .55rem; font-weight: 400;
+      text-transform: uppercase; letter-spacing: .24em;
+    }
+
+    .preview-toggle {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 11px 8px 14px;
+      border: 1px solid rgba(216, 180, 119, .2);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .025);
+      color: rgba(249, 241, 229, .68);
+      font-size: .66rem; letter-spacing: .055em;
+      cursor: pointer; opacity: .72;
+      transition: opacity .3s ease, border-color .3s ease, background .3s ease, color .3s ease;
+    }
+    .preview-toggle:hover { opacity: 1; border-color: rgba(216, 180, 119, .48); }
+    .preview-toggle svg { width: 14px; height: 14px; flex: 0 0 auto; }
+    .preview-toggle__track {
+      position: relative; width: 29px; height: 16px; flex: 0 0 auto;
+      border-radius: 999px; background: rgba(249, 241, 229, .14);
+      transition: background .3s ease;
+    }
+    .preview-toggle__track::after {
+      content: ""; position: absolute; top: 3px; left: 3px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(249, 241, 229, .8);
+      transition: transform .3s var(--ease-soft), background .3s ease;
+    }
+    .preview-toggle[aria-checked="true"] {
+      opacity: 1; color: var(--gold-soft);
+      border-color: rgba(216, 180, 119, .56);
+      background: rgba(216, 180, 119, .1);
+    }
+    .preview-toggle[aria-checked="true"] .preview-toggle__track { background: var(--gold); }
+    .preview-toggle[aria-checked="true"] .preview-toggle__track::after {
+      transform: translateX(13px); background: var(--wine-900);
+    }
+
+    /* =========================================================
+       04 · PORTADA
+       ========================================================= */
+    .hero {
+      position: relative; z-index: 2;
+      width: min(980px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: clamp(70px, 10vw, 132px) 0 clamp(56px, 8vw, 96px);
+      text-align: center;
+    }
+    .ornament {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      color: var(--gold); opacity: .84;
+    }
+    .ornament__line {
+      display: block; width: clamp(32px, 7vw, 72px); height: 1px;
+      background: linear-gradient(90deg, transparent, currentColor);
+    }
+    .ornament__line:last-child { transform: scaleX(-1); }
+    .ornament svg { width: 15px; height: 15px; }
+    .hero .ornament { margin-bottom: 27px; }
+    .eyebrow {
+      margin: 0; color: var(--gold-soft);
+      font-size: clamp(.58rem, 1.2vw, .67rem); font-weight: 400;
+      letter-spacing: .3em; text-transform: uppercase;
+      opacity: .8;
+    }
+    .hero h1 {
+      margin: 22px auto 0; max-width: 940px;
+      color: var(--cream); font-family: var(--font-serif);
+      font-size: clamp(2.3rem, 6.45vw, 6.15rem);
+      font-weight: 500; line-height: 1.035; letter-spacing: -.042em;
+      text-wrap: balance;
+    }
+    .hero h1 em {
+      position: relative; display: inline-block;
+      color: var(--gold-soft); font-weight: 400;
+      padding-bottom: .06em;
+    }
+    .hero h1 em::after {
+      content: ""; position: absolute; left: 2%; right: 2%; bottom: -.02em;
+      height: .34em; border-top: 1px solid rgba(216, 180, 119, .34);
+      border-radius: 50%; transform: rotate(-1.3deg);
+    }
+    .hero__lede {
+      max-width: 590px; margin: 26px auto 0;
+      color: rgba(249, 241, 229, .68);
+      font-size: clamp(.85rem, 1.4vw, .98rem);
+      font-weight: 300; line-height: 1.9;
+    }
+    .hero__status {
+      display: inline-flex; align-items: center; gap: 9px;
+      margin-top: 30px; padding: 8px 15px;
+      border: 1px solid rgba(216, 180, 119, .18);
+      border-radius: 999px;
+      color: rgba(240, 221, 184, .78);
+      background: rgba(255, 255, 255, .025);
+      font-size: .65rem; letter-spacing: .08em;
+      transition: border-color .3s ease, background .3s ease;
+    }
+    .hero__status svg { width: 12px; height: 12px; flex: 0 0 auto; color: var(--gold); }
+    .hero__status.is-live {
+      border-color: rgba(216, 180, 119, .36);
+      background: rgba(216, 180, 119, .06);
+    }
+    .hero__status.is-preview {
+      color: var(--wine-900); background: var(--gold-soft);
+      border-color: var(--gold-soft);
+    }
+    .hero__status.is-preview svg { color: var(--wine-700); }
+    .scroll-cue {
+      display: flex; flex-direction: column; align-items: center; gap: 9px;
+      margin-top: 48px; color: rgba(249, 241, 229, .36);
+      font-size: .53rem; font-weight: 400;
+      letter-spacing: .25em; text-transform: uppercase;
+    }
+    .scroll-cue__line {
+      width: 1px; height: 38px;
+      background: linear-gradient(180deg, rgba(216, 180, 119, .55), transparent);
+      transform-origin: top; animation: scrollLine 2.4s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0%, 100% { transform: scaleY(.45); opacity: .4; }
+      50% { transform: scaleY(1); opacity: .9; }
+    }
+
+    /* =========================================================
+       05 · CALENDARIO
+       ========================================================= */
+    .calendar {
+      position: relative; z-index: 2;
+      width: min(1180px, calc(100% - 64px));
+      margin: 0 auto;
+      padding-bottom: clamp(62px, 9vw, 110px);
+      scroll-margin-top: 24px;
+    }
+    .calendar__head {
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 42px;
+      padding-top: 33px; margin-bottom: 34px;
+      border-top: 1px solid rgba(216, 180, 119, .16);
+    }
+    .section-kicker {
+      margin: 0 0 10px; color: var(--gold);
+      font-size: .58rem; font-weight: 500;
+      letter-spacing: .3em; text-transform: uppercase;
+    }
+    .calendar__title {
+      margin: 0; max-width: 620px;
+      color: var(--cream); font-family: var(--font-serif);
+      font-size: clamp(1.75rem, 3.3vw, 2.85rem);
+      font-weight: 500; line-height: 1.15; letter-spacing: -.025em;
+    }
+    .calendar__sub {
+      max-width: 480px; margin: 11px 0 0;
+      color: rgba(249, 241, 229, .5);
+      font-size: .76rem; font-weight: 300; line-height: 1.7;
+    }
+    .progress {
+      flex: 0 0 auto; width: 220px; padding-bottom: 3px;
+    }
+    .progress__top {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+      margin-bottom: 9px;
+    }
+    .progress__label {
+      color: rgba(249, 241, 229, .46);
+      font-size: .57rem; letter-spacing: .17em; text-transform: uppercase;
+    }
+    .progress__count {
+      color: var(--gold-soft); font-family: var(--font-serif);
+      font-size: 1.45rem; line-height: 1; letter-spacing: -.03em;
+    }
+    .progress__count span { color: rgba(249, 241, 229, .34); font-size: .82rem; font-family: var(--font-sans); letter-spacing: 0; }
+    .progress__track {
+      position: relative; height: 4px; overflow: hidden;
+      border-radius: 999px; background: rgba(249, 241, 229, .1);
+    }
+    .progress__fill {
+      display: block; width: 0; height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #8d6131, var(--gold), var(--gold-soft));
+      box-shadow: 0 0 16px rgba(216, 180, 119, .35);
+      transition: width .9s var(--ease-soft);
+    }
+    .progress__caption {
+      margin: 9px 0 0; color: rgba(249, 241, 229, .3);
+      font-size: .53rem; letter-spacing: .08em; text-align: right;
+    }
+
+    .preview-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      margin-bottom: 24px; padding: 13px 17px;
+      border: 1px solid rgba(216, 180, 119, .28);
+      border-radius: 13px;
+      background: linear-gradient(100deg, rgba(216, 180, 119, .11), rgba(216, 180, 119, .025));
+      color: var(--gold-soft); font-size: .72rem;
+    }
+    .preview-banner[hidden] { display: none; }
+    .preview-banner__text { display: flex; align-items: center; gap: 10px; line-height: 1.55; }
+    .preview-banner__text svg { width: 15px; height: 15px; flex: 0 0 auto; }
+    .reset-btn {
+      flex: 0 0 auto; padding: 6px 11px;
+      border: 1px solid rgba(216, 180, 119, .3); border-radius: 999px;
+      color: rgba(240, 221, 184, .82); background: transparent;
+      font-size: .6rem; letter-spacing: .04em; cursor: pointer;
+      transition: background .25s ease, color .25s ease, border-color .25s ease;
+    }
+    .reset-btn:hover { color: var(--wine-900); background: var(--gold-soft); border-color: var(--gold-soft); }
+    .reset-btn.is-armed { color: var(--cream); background: rgba(130, 50, 56, .86); border-color: rgba(223, 163, 150, .6); }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: clamp(13px, 1.8vw, 23px);
+      perspective: 1500px;
+    }
+
+    /* ---- Puertas ---- */
+    .door {
+      --arch: clamp(3rem, 7.4vw, 5.35rem);
+      position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5.15;
+      padding: 0; border: 0; border-radius: var(--arch) var(--arch) 13px 13px;
+      background: transparent; cursor: pointer;
+      perspective: 1200px;
+      opacity: 0; transform: translateY(14px);
+      animation: doorIn .75s var(--ease-soft) forwards;
+      animation-delay: calc(var(--i) * 34ms + 80ms);
+    }
+    @keyframes doorIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .calendar-grid.no-intro .door { animation: none; opacity: 1; transform: none; }
+    .door:hover { z-index: 3; }
+    .door__inner {
+      position: relative; width: 100%; height: 100%;
+      border-radius: inherit;
+      transform-style: preserve-3d;
+      transition: transform .88s cubic-bezier(.2, .76, .2, 1);
+    }
+    .door:not(.is-open):hover .door__inner { transform: translateY(-7px) rotateX(2deg); }
+    .door.is-open .door__inner { transform: rotateY(180deg); }
+    .door.is-open:hover .door__inner { transform: rotateY(180deg) translateY(-4px); }
+    .door__face {
+      position: absolute; inset: 0; overflow: hidden;
+      border-radius: inherit;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    }
+    .door__front {
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      padding: clamp(15px, 2.1vw, 26px) clamp(8px, 1.5vw, 17px) clamp(13px, 1.9vw, 21px);
+      color: var(--wine-800);
+      border: 1px solid rgba(157, 113, 60, .5);
+      background:
+        radial-gradient(ellipse at 50% -4%, rgba(255, 255, 255, .96), transparent 43%),
+        linear-gradient(156deg, #fcf6ec 0%, #f4e8d6 54%, #e9d6bb 100%);
+      box-shadow:
+        0 24px 35px -28px rgba(0, 0, 0, .95),
+        inset 0 1px 0 rgba(255, 255, 255, .9);
+      transition: border-color .35s ease, box-shadow .35s ease;
+    }
+    .door__front::before {
+      content: ""; position: absolute; inset: 7px; pointer-events: none;
+      border: 1px solid rgba(157, 113, 60, .27);
+      border-radius: calc(var(--arch) - 6px) calc(var(--arch) - 6px) 8px 8px;
+    }
+    .door__front::after {
+      content: ""; position: absolute; top: -30%; left: -80%;
+      width: 55%; height: 160%; opacity: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .72), transparent);
+      transform: rotate(24deg); pointer-events: none;
+      transition: left .9s ease, opacity .3s ease;
+    }
+    .door:not(.is-open):hover .door__front {
+      border-color: rgba(198, 154, 85, .9);
+      box-shadow:
+        0 32px 48px -28px rgba(0, 0, 0, 1),
+        0 0 28px -8px rgba(216, 180, 119, .24),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+    }
+    .door:not(.is-open):hover .door__front::after { left: 135%; opacity: 1; }
+    .door__star { height: 12px; display: flex; align-items: center; color: rgba(139, 94, 41, .8); }
+    .door__star svg { width: 10px; height: 10px; }
+    .door__month {
+      color: rgba(103, 33, 55, .68);
+      font-size: clamp(.43rem, .75vw, .53rem); font-weight: 500;
+      letter-spacing: .27em; text-transform: uppercase;
+    }
+    .door__number {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 100%; margin-top: -1px;
+      color: var(--wine-800); font-family: var(--font-serif);
+      font-size: clamp(2.25rem, 4.5vw, 3.75rem); font-weight: 500;
+      line-height: .98; letter-spacing: -.075em;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    .door__number::before,
+    .door__number::after {
+      content: ""; position: absolute; top: 50%; width: clamp(10px, 2.2vw, 23px);
+      height: 1px; background: linear-gradient(90deg, transparent, rgba(151, 107, 55, .48));
+    }
+    .door__number::before { right: calc(50% + clamp(1.55rem, 3vw, 2.45rem)); }
+    .door__number::after { left: calc(50% + clamp(1.55rem, 3vw, 2.45rem)); transform: scaleX(-1); }
+    .door__divider {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      color: rgba(151, 107, 55, .78);
+      width: 64%; margin-top: -1px;
+    }
+    .door__divider span { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, currentColor); opacity: .55; }
+    .door__divider span:last-child { transform: scaleX(-1); }
+    .door__divider i { width: 3px; height: 3px; border: 1px solid currentColor; transform: rotate(45deg); flex: 0 0 auto; }
+    .door__hint {
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      color: rgba(85, 54, 53, .85);
+      font-size: clamp(.44rem, .75vw, .55rem); font-weight: 500;
+      letter-spacing: .18em; text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .door__hint svg { width: 10px; height: 10px; transition: transform .35s var(--ease-soft); }
+    .door:not(.is-open):hover .door__hint svg { transform: translateX(3px); }
+    .door.is-locked .door__front {
+      border-color: rgba(145, 110, 72, .32);
+      background:
+        radial-gradient(ellipse at 50% -5%, rgba(255, 255, 255, .55), transparent 43%),
+        linear-gradient(156deg, #f2e9dc 0%, #e9dcc9 55%, #ddc9b1 100%);
+    }
+    .door.is-locked .door__front::before { border-color: rgba(145, 110, 72, .19); }
+    .door.is-locked .door__number { color: rgba(70, 38, 43, .64); }
+    .door.is-locked .door__hint { color: rgba(105, 78, 71, .72); }
+    .door.is-locked .door__star { opacity: .55; }
+    .door.is-locked .door__hint svg { width: 9px; height: 9px; }
+    .door.is-today .door__front {
+      border-color: rgba(194, 144, 70, .95);
+      box-shadow:
+        0 26px 42px -29px rgba(0, 0, 0, .96),
+        0 0 0 1px rgba(216, 180, 119, .32),
+        0 0 36px -9px rgba(216, 180, 119, .4);
+    }
+    .door.is-today .door__front::before { border-color: rgba(170, 119, 53, .5); }
+    .door.is-today .door__star svg { animation: starPulse 2.8s ease-in-out infinite; }
+    @keyframes starPulse {
+      0%, 100% { opacity: .95; transform: scale(1); filter: drop-shadow(0 0 0 rgba(216, 180, 119, 0)); }
+      50% { opacity: 1; transform: scale(1.22); filter: drop-shadow(0 0 5px rgba(216, 180, 119, .8)); }
+    }
+    .door[data-day="24"] .door__front {
+      color: var(--gold-soft); border-color: rgba(216, 180, 119, .7);
+      background:
+        radial-gradient(ellipse at 50% -2%, rgba(216, 180, 119, .26), transparent 52%),
+        linear-gradient(155deg, #27503f 0%, #183b2d 54%, #102a20 100%);
+      box-shadow:
+        0 26px 38px -28px rgba(0, 0, 0, 1),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+    .door[data-day="24"] .door__front::before { border-color: rgba(216, 180, 119, .3); }
+    .door[data-day="24"] .door__number { color: var(--gold-soft); }
+    .door[data-day="24"] .door__month,
+    .door[data-day="24"] .door__hint { color: rgba(240, 221, 184, .72); }
+    .door[data-day="24"] .door__star,
+    .door[data-day="24"] .door__divider { color: rgba(240, 221, 184, .78); }
+    .door[data-day="24"] .door__number::before,
+    .door[data-day="24"] .door__number::after { background: linear-gradient(90deg, transparent, rgba(216, 180, 119, .58)); }
+    .door.is-locked[data-day="24"] .door__front {
+      background:
+        radial-gradient(ellipse at 50% -2%, rgba(216, 180, 119, .17), transparent 52%),
+        linear-gradient(155deg, #244437 0%, #183126 54%, #11251d 100%);
+    }
+    .door.is-locked[data-day="24"] .door__number { color: rgba(240, 221, 184, .62); }
+
+    .door.is-shaking .door__front { animation: doorShake .48s ease both; }
+    @keyframes doorShake {
+      10%, 90% { transform: translateX(-2px) rotate(-.35deg); }
+      20%, 80% { transform: translateX(3px) rotate(.45deg); }
+      30%, 50%, 70% { transform: translateX(-4px) rotate(-.55deg); }
+      40%, 60% { transform: translateX(4px) rotate(.55deg); }
+    }
+
+    .door__back {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 16% 13%;
+      color: var(--cream);
+      border: 1px solid rgba(216, 180, 119, .54);
+      background:
+        radial-gradient(circle at 50% 36%, rgba(126, 46, 64, .58), transparent 58%),
+        linear-gradient(150deg, #441625 0%, #2d0d18 58%, #210811 100%);
+      transform: rotateY(180deg);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .025), inset 0 0 48px rgba(0, 0, 0, .26);
+    }
+    .door__back::before {
+      content: ""; position: absolute; inset: 7px; pointer-events: none;
+      border: 1px solid rgba(216, 180, 119, .24);
+      border-radius: calc(var(--arch) - 6px) calc(var(--arch) - 6px) 8px 8px;
+    }
+    .door__back-kicker {
+      color: rgba(240, 221, 184, .48); font-size: clamp(.4rem, .68vw, .5rem);
+      letter-spacing: .25em; text-transform: uppercase;
+    }
+    .door__back-icon {
+      display: grid; place-items: center;
+      width: clamp(26px, 4.7vw, 38px); aspect-ratio: 1;
+      margin: clamp(8px, 1.6vw, 13px) 0;
+      border: 1px solid rgba(216, 180, 119, .32); border-radius: 50%;
+      color: var(--gold-soft);
+      background: rgba(255, 255, 255, .025);
+    }
+    .door__back-icon svg { width: 44%; height: 44%; }
+    .door__back-day {
+      color: var(--gold-soft); font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 4.4vw, 3.8rem); font-weight: 400;
+      line-height: 1; letter-spacing: -.06em;
+    }
+    .door__back-status {
+      margin-top: clamp(4px, .8vw, 7px);
+      color: rgba(249, 241, 229, .53); font-size: clamp(.38rem, .65vw, .49rem);
+      letter-spacing: .16em; text-transform: uppercase;
+    }
+    .door__back-hint {
+      display: flex; align-items: center; gap: 5px;
+      margin-top: clamp(13px, 2.6vw, 22px);
+      color: rgba(240, 221, 184, .75); font-size: clamp(.42rem, .7vw, .52rem);
+      letter-spacing: .06em;
+    }
+    .door__back-hint svg { width: 10px; height: 10px; }
+    .door__back-fav {
+      position: absolute; top: clamp(12px, 2vw, 18px); right: clamp(12px, 2vw, 18px);
+      color: rgba(240, 190, 177, .85);
+    }
+    .door__back-fav svg { width: 12px; height: 12px; fill: currentColor; }
+    .door.is-open:hover .door__back { border-color: rgba(240, 221, 184, .88); }
+
+    /* ---- Pie del calendario ---- */
+    .calendar__foot {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      margin-top: 38px; color: rgba(249, 241, 229, .38);
+      font-family: var(--font-serif); font-size: .82rem; font-style: italic;
+      text-align: center;
+    }
+    .calendar__foot::before,
+    .calendar__foot::after {
+      content: ""; width: 35px; height: 1px; flex: 0 0 auto;
+      background: linear-gradient(90deg, transparent, rgba(216, 180, 119, .4));
+    }
+    .calendar__foot::after { transform: scaleX(-1); }
+
+    @media (max-width: 1080px) {
+      .calendar-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .door { --arch: clamp(3rem, 8.8vw, 5rem); }
+      .door__number { font-size: clamp(2.45rem, 5vw, 3.65rem); }
+    }
+    @media (max-width: 760px) {
+      .calendar { width: calc(100% - 40px); }
+      .calendar__head { flex-direction: column; align-items: stretch; gap: 22px; padding-top: 27px; }
+      .progress { width: 100%; }
+      .progress__caption { text-align: left; }
+      .preview-banner { align-items: flex-start; flex-direction: column; gap: 10px; }
+    }
+    @media (max-width: 640px) {
+      .calendar-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .door { --arch: clamp(2.3rem, 11.5vw, 3.6rem); border-radius: var(--arch) var(--arch) 10px 10px; }
+      .door__front { padding: 14px 8px 13px; }
+      .door__front::before { inset: 5px; border-radius: calc(var(--arch) - 5px) calc(var(--arch) - 5px) 6px 6px; }
+      .door__back::before { inset: 5px; border-radius: calc(var(--arch) - 5px) calc(var(--arch) - 5px) 6px 6px; }
+      .door__number { font-size: clamp(1.95rem, 8.4vw, 2.8rem); }
+      .door__number::before { right: calc(50% + 1.35rem); }
+      .door__number::after { left: calc(50% + 1.35rem); }
+      .door__month { font-size: .4rem; letter-spacing: .19em; }
+      .door__divider { width: 56%; }
+      .door__hint { font-size: .4rem; letter-spacing: .1em; gap: 4px; }
+      .door__back-hint { font-size: .38rem; }
+      .door__back-status { font-size: .34rem; letter-spacing: .08em; }
+      .door__back-fav { top: 10px; right: 10px; }
+      .door__back-fav svg { width: 10px; height: 10px; }
+      .door.is-today .door__front { box-shadow: 0 0 0 1px rgba(216,180,119,.3), 0 0 24px -8px rgba(216,180,119,.35); }
+    }
+    @media (max-width: 370px) {
+      .calendar { width: calc(100% - 26px); }
+      .calendar-grid { gap: 9px; }
+      .door__hint { font-size: .36rem; }
+      .door__month { font-size: .36rem; }
+    }
+
+    /* =========================================================
+       06 · CIERRE DE PÁGINA
+       ========================================================= */
+    .closing {
+      position: relative; z-index: 2; isolation: isolate; overflow: hidden;
+      width: min(860px, calc(100% - 48px));
+      margin: 0 auto clamp(64px, 9vw, 108px);
+      padding: clamp(48px, 7vw, 76px) clamp(26px, 6vw, 80px) clamp(42px, 6vw, 62px);
+      border: 1px solid rgba(216, 180, 119, .25);
+      border-radius: clamp(150px, 27vw, 330px) clamp(150px, 27vw, 330px) 22px 22px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(216, 180, 119, .12), transparent 55%),
+        linear-gradient(165deg, rgba(32, 75, 57, .88) 0%, rgba(18, 46, 35, .94) 100%);
+      box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255, 255, 255, .04);
+    }
+    .closing::before {
+      content: ""; position: absolute; inset: 11px; z-index: -1;
+      border: 1px solid rgba(216, 180, 119, .18);
+      border-radius: inherit;
+    }
+    .closing::after {
+      content: ""; position: absolute; z-index: -1;
+      width: 300px; height: 300px; left: 50%; bottom: -210px;
+      border-radius: 50%; transform: translateX(-50%);
+      background: rgba(216, 180, 119, .08); filter: blur(50px);
+    }
+    .closing__ornament { margin-bottom: 25px; }
+    .closing blockquote {
+      max-width: 650px; margin: 0 auto;
+      color: var(--cream); font-family: var(--font-serif);
+      font-size: clamp(1.45rem, 3.2vw, 2.2rem);
+      font-style: italic; font-weight: 400; line-height: 1.45;
+      letter-spacing: -.018em;
+    }
+    .closing blockquote span { color: var(--gold-soft); }
+    .closing__sign {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 26px; color: rgba(240, 221, 184, .72);
+      font-size: .62rem; letter-spacing: .15em; text-transform: uppercase;
+    }
+    .closing__sign::before, .closing__sign::after {
+      content: ""; width: 24px; height: 1px;
+      background: rgba(216, 180, 119, .35);
+    }
+    .site-footer {
+      position: relative; z-index: 2;
+      padding: 0 24px 34px;
+      color: rgba(249, 241, 229, .32);
+      font-size: .58rem; letter-spacing: .15em; text-align: center;
+      text-transform: uppercase;
+    }
+    .site-footer__heart { color: rgba(216, 180, 119, .8); font-size: .72rem; }
+
+    /* =========================================================
+       07 · MODAL DE SORPRESA
+       ========================================================= */
+    .modal-root {
+      position: fixed; inset: 0; z-index: 1000;
+      display: grid; place-items: center;
+      padding: 24px;
+      visibility: hidden; pointer-events: none; opacity: 0;
+      transition: opacity .35s ease, visibility 0s linear .35s;
+    }
+    .modal-root[hidden] { display: none; }
+    .modal-root.is-visible {
+      visibility: visible; pointer-events: auto; opacity: 1;
+      transition: opacity .35s ease;
+    }
+    .modal__backdrop {
+      position: absolute; inset: 0;
+      background: rgba(14, 4, 8, .82);
+      -webkit-backdrop-filter: blur(13px) saturate(120%);
+      backdrop-filter: blur(13px) saturate(120%);
+    }
+    .modal {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: minmax(0, .81fr) minmax(0, 1.19fr);
+      width: min(980px, 100%);
+      max-height: min(760px, calc(100dvh - 48px));
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--cream);
+      border-radius: 26px;
+      box-shadow:
+        0 45px 110px -32px rgba(0, 0, 0, .88),
+        0 0 0 1px rgba(216, 180, 119, .56);
+      opacity: 0; transform: translateY(26px) scale(.965);
+      transition: opacity .42s ease, transform .65s cubic-bezier(.16, 1, .3, 1);
+    }
+    .modal-root.is-visible .modal { opacity: 1; transform: translateY(0) scale(1); }
+    .modal__visual {
+      position: relative; overflow: hidden; isolation: isolate;
+      min-height: 520px; padding: 30px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      color: var(--gold-soft);
+      background:
+        radial-gradient(circle at 50% 34%, rgba(166, 89, 79, .32), transparent 48%),
+        linear-gradient(160deg, #315a48 0%, #173c2e 48%, #0d251c 100%);
+    }
+    .modal__visual[data-kind="carta"] {
+      background:
+        radial-gradient(circle at 50% 34%, rgba(216, 180, 119, .13), transparent 50%),
+        linear-gradient(160deg, #234b3a 0%, #16382b 50%, #0b241b 100%);
+    }
+    .modal__visual[data-kind="vale"] {
+      background:
+        radial-gradient(circle at 50% 34%, rgba(201, 137, 118, .22), transparent 51%),
+        linear-gradient(160deg, #561c2c 0%, #34101c 50%, #210811 100%);
+    }
+    .modal__visual[data-kind="enlace"] {
+      background:
+        radial-gradient(circle at 50% 34%, rgba(216, 180, 119, .17), transparent 52%),
+        linear-gradient(160deg, #421a27 0%, #260d16 50%, #16070d 100%);
+    }
+    .modal__visual[data-kind="foto"] { padding: 0; background: #1c0910; }
+    .modal__visual::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; opacity: .32; pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 18% 24%, rgba(255, 255, 255, .65), transparent),
+        radial-gradient(1.5px 1.5px at 80% 17%, rgba(240, 221, 184, .55), transparent),
+        radial-gradient(1px 1px at 68% 68%, rgba(255, 255, 255, .4), transparent),
+        radial-gradient(1px 1px at 28% 78%, rgba(240, 221, 184, .34), transparent);
+    }
+    .modal__visual::after {
+      content: ""; position: absolute; z-index: 0; pointer-events: none;
+      width: 78%; aspect-ratio: 1; left: 50%; top: 46%;
+      border: 1px solid rgba(216, 180, 119, .16); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 30px rgba(216, 180, 119, .025), 0 0 0 70px rgba(216, 180, 119, .018);
+    }
+    .visual__top {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(240, 221, 184, .64);
+      font-size: .54rem; letter-spacing: .22em; text-transform: uppercase;
+    }
+    .visual__top-line { flex: 1; height: 1px; background: rgba(240, 221, 184, .15); }
+    .visual__center {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; gap: 15px; text-align: center;
+    }
+    .visual__ghost {
+      position: absolute; top: 50%; left: 50%; z-index: -1;
+      color: transparent; font-family: var(--font-serif);
+      font-size: clamp(10rem, 20vw, 17rem); font-weight: 400; line-height: 1;
+      letter-spacing: -.09em;
+      -webkit-text-stroke: 1px rgba(240, 221, 184, .13);
+      transform: translate(-52%, -52%);
+      user-select: none;
+    }
+    .visual__icon {
+      display: grid; place-items: center;
+      width: clamp(58px, 7.5vw, 76px); aspect-ratio: 1;
+      border: 1px solid rgba(240, 221, 184, .38); border-radius: 50%;
+      color: var(--gold-soft);
+      background: rgba(255, 255, 255, .035);
+      box-shadow: 0 0 0 7px rgba(216, 180, 119, .04);
+    }
+    .visual__icon svg { width: 38%; height: 38%; }
+    .visual__kind {
+      color: rgba(249, 241, 229, .56);
+      font-size: .56rem; letter-spacing: .19em; text-transform: uppercase;
+    }
+    .visual__quote {
+      max-width: 190px; margin: 0;
+      color: rgba(249, 241, 229, .65);
+      font-family: var(--font-serif); font-size: .9rem; font-style: italic; line-height: 1.5;
+    }
+    .visual__bottom {
+      position: relative; z-index: 2;
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+      padding-top: 15px; border-top: 1px solid rgba(240, 221, 184, .13);
+      color: rgba(240, 221, 184, .44);
+      font-size: .49rem; letter-spacing: .18em; text-transform: uppercase;
+    }
+    .visual__photo {
+      position: absolute; inset: 0; z-index: 0;
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 5s ease-out;
+    }
+    .modal-root.is-visible .visual__photo { transform: scale(1.035); }
+    .visual__photo-shade {
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(18, 5, 10, .54) 0%, transparent 25%, transparent 57%, rgba(18, 5, 10, .82) 100%);
+    }
+    .visual__photo-fallback {
+      position: absolute; inset: 0; z-index: 0;
+      display: none; place-items: center;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(216, 180, 119, .14), transparent 50%),
+        linear-gradient(150deg, #3d1722, #1e0910);
+      color: rgba(240, 221, 184, .4);
+    }
+    .visual__photo-fallback.is-visible { display: grid; }
+    .visual__photo-fallback svg { width: 52px; height: 52px; }
+    .modal__visual[data-kind="foto"] .visual__top,
+    .modal__visual[data-kind="foto"] .visual__bottom {
+      padding-left: 28px; padding-right: 28px; color: rgba(255, 255, 255, .8);
+    }
+    .modal__visual[data-kind="foto"] .visual__top { padding-top: 28px; }
+    .modal__visual[data-kind="foto"] .visual__bottom {
+      padding-bottom: 27px; border-top-color: rgba(255, 255, 255, .22);
+    }
+    .visual__caption {
+      max-width: 78%; margin: 0;
+      font-family: var(--font-serif); font-size: .92rem; font-style: italic;
+      line-height: 1.4; color: rgba(255, 255, 255, .9);
+    }
+
+    .modal__close {
+      position: absolute; z-index: 6; top: 16px; right: 16px;
+      display: grid; place-items: center;
+      width: 38px; height: 38px; padding: 0;
+      border: 1px solid rgba(86, 45, 42, .16); border-radius: 50%;
+      color: var(--wine-800); background: rgba(249, 241, 229, .88);
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      transition: background .25s ease, transform .25s ease, border-color .25s ease;
+    }
+    .modal__close:hover { background: var(--wine-800); color: var(--cream); border-color: var(--wine-800); transform: rotate(6deg); }
+    .modal__close svg { width: 15px; height: 15px; }
+    .modal__content {
+      position: relative; min-height: 0; overflow-y: auto;
+      display: flex; flex-direction: column;
+      padding: clamp(34px, 4.6vw, 54px) clamp(28px, 4vw, 52px) 29px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(216, 180, 119, .085), transparent 33%),
+        var(--cream);
+      scrollbar-width: thin; scrollbar-color: rgba(103, 33, 55, .28) transparent;
+    }
+    .modal__content::-webkit-scrollbar { width: 5px; }
+    .modal__content::-webkit-scrollbar-thumb { background: rgba(103, 33, 55, .24); border-radius: 999px; }
+    .modal__kicker {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 40px 13px 0;
+      color: var(--gold-deep);
+      font-size: .58rem; font-weight: 500;
+      letter-spacing: .24em; text-transform: uppercase;
+    }
+    .modal__kicker-line { width: 26px; height: 1px; background: currentColor; opacity: .5; }
+    .modal__title {
+      margin: 0 32px 20px 0;
+      color: var(--wine-800); font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.35vw, 2.9rem);
+      font-weight: 500; line-height: 1.1; letter-spacing: -.032em;
+      text-wrap: balance;
+    }
+    .modal__body { color: var(--ink-soft); font-size: .88rem; font-weight: 300; line-height: 1.85; }
+    .modal__body p { margin: 0 0 1em; }
+    .modal__body p:last-child { margin-bottom: 0; }
+    .modal__body .letter-opener {
+      color: #4f3437; font-family: var(--font-serif);
+      font-size: 1.08rem; font-style: italic; line-height: 1.65;
+    }
+    .letter-signature {
+      margin: 24px 0 0; padding-top: 16px;
+      border-top: 1px solid rgba(103, 33, 55, .12);
+      color: var(--wine-600); font-family: var(--font-serif);
+      font-size: 1.15rem; font-style: italic; text-align: right; line-height: 1.45;
+    }
+    .modal__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin-top: 25px; }
+    .modal__actions:empty { display: none; }
+    .modal__actions .action-note { flex-basis: 100%; margin: 0; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 43px; padding: 11px 19px;
+      border: 1px solid transparent; border-radius: 999px;
+      font-size: .72rem; font-weight: 500; line-height: 1.2; text-decoration: none;
+      cursor: pointer;
+      transition: transform .25s ease, background .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+    .btn svg { width: 14px; height: 14px; flex: 0 0 auto; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn--primary {
+      color: var(--cream); background: var(--wine-800);
+      box-shadow: 0 10px 24px -12px rgba(52, 16, 28, .75);
+    }
+    .btn--primary:hover { background: var(--wine-700); box-shadow: 0 14px 30px -12px rgba(52, 16, 28, .8); }
+    .btn--redeemed { color: var(--forest); background: rgba(24, 58, 45, .1); border-color: rgba(24, 58, 45, .22); box-shadow: none; cursor: default; }
+    .btn--redeemed:hover { transform: none; }
+    .btn--link { color: var(--cream); background: var(--forest); box-shadow: 0 10px 24px -13px rgba(13, 45, 33, .85); }
+    .btn--link:hover { background: #1e4938; box-shadow: 0 14px 30px -14px rgba(13, 45, 33, .8); }
+    .action-note { margin: 10px 0 0; color: rgba(117, 95, 94, .8); font-size: .65rem; font-style: italic; }
+    .modal__note {
+      margin-top: 21px; padding: 13px 15px;
+      border-left: 2px solid rgba(216, 180, 119, .55);
+      color: #725757; background: rgba(239, 223, 200, .35);
+      font-family: var(--font-serif); font-size: .88rem; font-style: italic; line-height: 1.6;
+    }
+
+    /* Vale */
+    .voucher {
+      position: relative; overflow: hidden;
+      margin: 23px 0 0; padding: 17px 19px 16px;
+      border: 1px dashed rgba(103, 33, 55, .32);
+      border-radius: 12px;
+      background:
+        linear-gradient(100deg, rgba(255, 255, 255, .35), transparent 45%),
+        rgba(239, 223, 200, .48);
+    }
+    .voucher::before, .voucher::after {
+      content: ""; position: absolute; top: 50%;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: var(--cream); transform: translateY(-50%);
+    }
+    .voucher::before { left: -7px; }
+    .voucher::after { right: -7px; }
+    .voucher__head {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding-bottom: 10px; border-bottom: 1px dashed rgba(103, 33, 55, .2);
+      color: var(--gold-deep); font-size: .53rem; letter-spacing: .2em; text-transform: uppercase;
+    }
+    .voucher__head span:last-child { color: rgba(103, 33, 55, .52); letter-spacing: .12em; }
+    .voucher__label {
+      display: block; margin: 13px 0 4px;
+      color: rgba(103, 33, 55, .55); font-size: .52rem; letter-spacing: .2em; text-transform: uppercase;
+    }
+    .voucher__main {
+      color: var(--wine-800); font-family: var(--font-serif);
+      font-size: 1.34rem; font-style: italic; line-height: 1.35;
+    }
+    .voucher__conditions {
+      display: block; margin-top: 9px;
+      color: rgba(117, 95, 94, .9); font-size: .64rem; line-height: 1.6;
+    }
+
+    /* Foto */
+    .photo-meta {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 22px; padding-top: 15px;
+      border-top: 1px solid rgba(103, 33, 55, .12);
+      color: var(--gold-deep); font-size: .56rem; letter-spacing: .14em; text-transform: uppercase;
+    }
+    .photo-meta svg { width: 13px; height: 13px; }
+
+    /* Enlace */
+    .song-card {
+      display: flex; align-items: center; gap: 14px;
+      margin-top: 22px; padding: 13px 15px;
+      border: 1px solid rgba(103, 33, 55, .12); border-radius: 12px;
+      background: rgba(239, 223, 200, .35);
+    }
+    .song-card__disc {
+      position: relative; display: grid; place-items: center; flex: 0 0 auto;
+      width: 43px; height: 43px; border-radius: 50%;
+      color: var(--gold-soft);
+      background: repeating-radial-gradient(circle, #2b0c16 0 2px, #3b1421 2px 3.5px);
+      box-shadow: 0 5px 12px -5px rgba(0, 0, 0, .5);
+    }
+    .song-card__disc::after {
+      content: ""; width: 11px; height: 11px; border-radius: 50%;
+      background: var(--gold); box-shadow: 0 0 0 3px rgba(216, 180, 119, .15);
+    }
+    .song-card__copy { min-width: 0; }
+    .song-card__label { color: var(--gold-deep); font-size: .5rem; letter-spacing: .17em; text-transform: uppercase; }
+    .song-card__title { margin: 2px 0 0; color: var(--wine-800); font-family: var(--font-serif); font-size: .98rem; line-height: 1.3; }
+
+    .modal__footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      margin-top: auto; padding-top: 26px;
+      border-top: 1px solid rgba(103, 33, 55, .11);
+    }
+    .favorite-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 0; border: 0; background: none;
+      color: rgba(117, 95, 94, .8);
+      font-size: .65rem; cursor: pointer;
+      transition: color .25s ease;
+    }
+    .favorite-btn:hover { color: var(--wine-600); }
+    .favorite-btn svg { width: 15px; height: 15px; transition: transform .25s ease, fill .25s ease; }
+    .favorite-btn[aria-pressed="true"] { color: var(--wine-600); }
+    .favorite-btn[aria-pressed="true"] svg { fill: currentColor; transform: scale(1.08); }
+    .modal__signature {
+      color: rgba(157, 113, 60, .72);
+      font-family: var(--font-serif); font-size: .82rem; font-style: italic;
+      text-align: right;
+    }
+
+    /* =========================================================
+       08 · TOAST, CORAZONES Y MOVIMIENTO REDUCIDO
+       ========================================================= */
+    .toast {
+      position: fixed; z-index: 1200; left: 50%; bottom: 28px;
+      display: flex; align-items: center; gap: 9px;
+      max-width: min(92vw, 580px);
+      padding: 12px 18px;
+      border: 1px solid rgba(216, 180, 119, .45); border-radius: 999px;
+      color: var(--wine-800); background: rgba(249, 241, 229, .97);
+      box-shadow: 0 18px 42px -18px rgba(0, 0, 0, .65);
+      font-size: .74rem; line-height: 1.45; text-align: center;
+      opacity: 0; visibility: hidden;
+      transform: translate(-50%, 16px);
+      transition: opacity .3s ease, transform .4s var(--ease-soft), visibility .3s;
+    }
+    .toast.is-visible { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+    .toast svg { width: 15px; height: 15px; flex: 0 0 auto; color: var(--wine-600); }
+    .toast__text { min-width: 0; }
+
+    #celebration {
+      position: fixed; inset: 0; z-index: 1300;
+      overflow: hidden; pointer-events: none;
+    }
+    .floating-heart {
+      position: fixed; top: 0; left: 0;
+      display: block; pointer-events: none;
+      line-height: 1;
+      will-change: transform, opacity;
+      animation: heartFloat var(--duration) cubic-bezier(.16, .7, .3, 1) forwards;
+      animation-delay: var(--delay);
+    }
+    @keyframes heartFloat {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.15) rotate(0deg); }
+      12% { opacity: var(--opacity); }
+      78% { opacity: var(--opacity); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(var(--scale)) rotate(var(--rot)); }
+    }
+
+    @media (max-width: 760px) {
+      .modal-root { padding: 12px; }
+      .modal {
+        grid-template-columns: 1fr; grid-template-rows: 185px minmax(0, 1fr);
+        width: 100%; max-height: calc(100dvh - 24px);
+        border-radius: 22px;
+      }
+      .modal__visual { min-height: 0; padding: 21px 23px; }
+      .modal__visual[data-kind="foto"] { padding: 0; }
+      .modal__visual[data-kind="foto"] .visual__top { padding: 20px 22px 0; }
+      .modal__visual[data-kind="foto"] .visual__bottom { padding: 0 22px 19px; }
+      .visual__ghost { font-size: 9rem; }
+      .visual__icon { width: 48px; }
+      .visual__center { flex-direction: row; gap: 13px; }
+      .visual__quote { max-width: 180px; font-size: .78rem; text-align: left; }
+      .visual__kind { font-size: .5rem; }
+      .visual__bottom { padding-top: 11px; }
+      .modal__content { padding: 28px 22px 22px; }
+      .modal__close { top: 13px; right: 13px; width: 35px; height: 35px; }
+      .modal__kicker { margin-right: 28px; font-size: .52rem; }
+      .modal__title { margin-right: 20px; font-size: clamp(1.8rem, 7.6vw, 2.4rem); }
+      .modal__body { font-size: .84rem; line-height: 1.78; }
+      .modal__footer { margin-top: 25px; }
+      .visual__caption { max-width: 72%; font-size: .82rem; }
+      .preview-toggle { padding: 7px 9px 7px 11px; gap: 8px; font-size: .6rem; }
+      .preview-toggle svg { width: 13px; height: 13px; }
+      .preview-toggle__track { width: 27px; height: 15px; }
+      .preview-toggle[aria-checked="true"] .preview-toggle__track::after { transform: translateX(12px); }
+    }
+    @media (max-width: 560px) {
+      .site-header { width: calc(100% - 36px); padding-top: 19px; }
+      .brand__seal { width: 37px; height: 37px; }
+      .brand__name { font-size: 1rem; }
+      .brand__tag { font-size: .49rem; letter-spacing: .18em; }
+      .hero { width: calc(100% - 36px); padding-top: 72px; padding-bottom: 58px; }
+      .hero h1 { margin-top: 18px; }
+      .hero__lede { margin-top: 22px; font-size: .83rem; line-height: 1.8; }
+      .hero__status { margin-top: 25px; font-size: .58rem; padding: 7px 12px; max-width: 100%; text-align: left; }
+      .scroll-cue { margin-top: 38px; font-size: .48rem; }
+      .closing { width: calc(100% - 34px); }
+      .calendar__title { font-size: 1.6rem; }
+      .calendar__sub { font-size: .7rem; }
+      .calendar__foot { font-size: .74rem; }
+      .toast { bottom: 18px; padding: 11px 15px; font-size: .68rem; border-radius: 15px; }
+      .modal__visual { padding: 18px 20px; }
+      .visual__top { font-size: .48rem; }
+      .visual__bottom { font-size: .44rem; }
+      .visual__center { gap: 11px; justify-content: flex-start; margin-top: 22px; }
+      .visual__icon { width: 44px; }
+      .visual__quote { display: none; }
+      .modal__content { padding: 26px 19px 19px; }
+      .modal__title { margin-bottom: 16px; }
+      .modal__kicker { margin-bottom: 10px; }
+      .modal__footer { gap: 10px; }
+      .modal__signature { font-size: .74rem; }
+      .favorite-btn { font-size: .6rem; }
+      .btn { min-height: 41px; padding: 10px 16px; font-size: .68rem; }
+      .voucher__main { font-size: 1.18rem; }
+      .site-footer { font-size: .52rem; letter-spacing: .11em; padding-bottom: 25px; }
+    }
+    @media (max-width: 370px) {
+      .preview-toggle__label { display: none; }
+      .preview-toggle { padding: 8px; }
+      .brand__tag { display: none; }
+      .modal { grid-template-rows: 165px minmax(0, 1fr); }
+      .modal__content { padding: 23px 16px 17px; }
+      .modal__title { margin-right: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .door { opacity: 1; transform: none; }
+      #snow, .grain { display: none; }
+      .scroll-cue__line { opacity: .5; }
+      .modal-root .modal { transform: none; }
+      .door:not(.is-open):hover .door__inner { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#calendario">Ir al calendario</a>
+
+  <div class="scene" aria-hidden="true">
+    <span class="orb orb--one"></span>
+    <span class="orb orb--two"></span>
+    <span class="orb orb--three"></span>
+  </div>
+  <canvas id="snow" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div id="pageContent">
+    <header class="site-header">
+      <a class="brand" href="#inicio" aria-label="Volver al inicio">
+        <span class="brand__seal" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/>
+          </svg>
+        </span>
+        <span class="brand__copy">
+          <span class="brand__name">Nuestra Navidad</span>
+          <span class="brand__tag">Hecho a mano, para ti</span>
+        </span>
+      </a>
+
+      <button class="preview-toggle" id="previewToggle" type="button" role="switch" aria-checked="false" title="Abrir todas las puertas para probar el calendario">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>
+        </svg>
+        <span class="preview-toggle__label">Vista previa</span>
+        <span class="preview-toggle__track" aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <main id="inicio">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="ornament" aria-hidden="true">
+          <span class="ornament__line"></span>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.8c.6 5.5 3.4 8.3 8.9 8.9-5.5.6-8.3 3.4-8.9 8.9-.6-5.5-3.4-8.3-8.9-8.9C8.6 10.1 11.4 7.3 12 1.8Z"/></svg>
+          <span class="ornament__line"></span>
+        </div>
+        <p class="eyebrow">Diciembre <span id="heroYear">2026</span> · Para la dueña de mi invierno</p>
+        <h1 id="heroTitle">Un diciembre<br><em>hecho de nosotros.</em></h1>
+        <p class="hero__lede">Detrás de cada puerta hay un pedacito de mi corazón. Ábrelas despacio, mi amor: algunas cosas bonitas merecen esperar su día.</p>
+        <div class="hero__status" id="heroStatus">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.8c.6 5.5 3.4 8.3 8.9 8.9-5.5.6-8.3 3.4-8.9 8.9-.6-5.5-3.4-8.3-8.9-8.9C8.6 10.1 11.4 7.3 12 1.8Z"/></svg>
+          <span id="heroStatusText">La primera puerta se abre el 1 de diciembre</span>
+        </div>
+        <div class="scroll-cue" aria-hidden="true">
+          <span class="scroll-cue__line"></span>
+          Desliza para descubrir
+        </div>
+      </section>
+
+      <section class="calendar" id="calendario" aria-labelledby="calendarTitle">
+        <header class="calendar__head">
+          <div>
+            <p class="section-kicker">Nuestro pequeño calendario</p>
+            <h2 class="calendar__title" id="calendarTitle">24 puertas, 24 secretos para ti</h2>
+            <p class="calendar__sub">Una sorpresa para cada día de diciembre. Toca la puerta cuando llegue su momento; las demás saben esperar.</p>
+          </div>
+          <div class="progress" aria-label="Progreso del calendario">
+            <div class="progress__top">
+              <span class="progress__label">Descubiertos</span>
+              <strong class="progress__count"><span id="openedCount">0</span><span> / 24</span></strong>
+            </div>
+            <div class="progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="24" aria-valuenow="0" id="progressBar">
+              <span class="progress__fill" id="progressFill"></span>
+            </div>
+            <p class="progress__caption" id="progressCaption">Hay 24 pequeños planes esperándote</p>
+          </div>
+        </header>
+
+        <div class="preview-banner" id="previewBanner" hidden>
+          <div class="preview-banner__text">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>
+            </svg>
+            <span>Estás viendo todas las puertas. Tus pruebas se guardan: reinicia el progreso antes de entregar el calendario.</span>
+          </div>
+          <button class="reset-btn" id="resetProgress" type="button">Reiniciar progreso</button>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid" role="group" aria-label="Las 24 puertas del calendario de Adviento"></div>
+
+        <p class="calendar__foot">Lo bonito también sabe esperar.</p>
+      </section>
+
+      <section class="closing" aria-labelledby="closingTitle">
+        <div class="ornament closing__ornament" aria-hidden="true">
+          <span class="ornament__line"></span>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.4c1.2 5.8 3.8 8.4 9.6 9.6-5.8 1.2-8.4 3.8-9.6 9.6-1.2-5.8-3.8-8.4-9.6-9.6 5.8-1.2 8.4-3.8 9.6-9.6Z"/></svg>
+          <span class="ornament__line"></span>
+        </div>
+        <blockquote id="closingTitle">Que nunca nos falten diciembres para seguir <span>encontrándonos.</span></blockquote>
+        <p class="closing__sign">Con todo mi amor, siempre</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      Hecho con <span class="site-footer__heart" aria-label="amor">♥</span> para ti · Diciembre <span id="footerYear">2026</span>
+    </footer>
+  </div>
+
+  <div class="modal-root" id="modalRoot" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <article class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody" tabindex="-1">
+      <button class="modal__close" id="modalClose" type="button" aria-label="Cerrar sorpresa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal__visual" id="modalVisual" aria-hidden="true"></div>
+      <div class="modal__content">
+        <p class="modal__kicker" id="modalKicker"></p>
+        <h2 class="modal__title" id="modalTitle"></h2>
+        <div class="modal__body" id="modalBody"></div>
+        <div class="modal__actions" id="modalActions"></div>
+        <footer class="modal__footer">
+          <button class="favorite-btn" id="favoriteBtn" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.5 1.1-1.1a5.5 5.5 0 0 0 0-7.8Z"/>
+            </svg>
+            <span id="favoriteLabel">Guardar en favoritos</span>
+          </button>
+          <span class="modal__signature">Siempre tuyo · ♥</span>
+        </footer>
+      </div>
+    </article>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.8 3.9 13A5.5 5.5 0 0 1 12 5.7 5.5 5.5 0 0 1 20.1 13Z"/></svg>
+    <span class="toast__text" id="toastText"></span>
+  </div>
+
+  <div id="celebration" aria-hidden="true"></div>
+
+  <script>
+    /* =========================================================
+       ✦ TU CALENDARIO, LISTO PARA PERSONALIZAR ✦
+       ---------------------------------------------------------
+       Solo tienes que editar los textos, las fotos o los enlaces
+       del array "sorpresas". Hay exactamente un objeto por día.
+
+       Tipos de sorpresa disponibles:
+       • "carta"  ↁEtitulo, texto, firma
+       • "vale"   ↁEtitulo, texto, canje, condiciones
+       • "foto"   ↁEtitulo, texto, foto, pie
+       • "enlace" ↁEtitulo, texto, url, boton, nota
+
+       Para las fotos puedes usar una ruta local ("fotos/nosotros.jpg")
+       o una URL. Si una imagen no carga, se muestra un marco elegante.
+       Los saltos de línea del texto se respetan al abrir la sorpresa.
+       ========================================================= */
+    const CONFIG = {
+      para: "Mi amor",                 // Aparece en el pie y en algunos mensajes
+      remitente: "Siempre tuyo",       // Firma bajo las cartas del modal
+      anio: new Date().getFullYear(),  // Puedes fijar un año, por ejemplo: 2026
+      horaDesbloqueo: 0,               // 0 = las puertas se abren a medianoche
+    };
+
+    const sorpresas = [
+      {
+        dia: 1,
+        tipo: "carta",
+        titulo: "Antes de que empiece todo",
+        texto: `Mi amor:\n\nSi estás leyendo esto, significa que diciembre ya empezó y que yo sigo teniendo la misma suerte de siempre: la de coincidir contigo.\n\nEste calendario no es más que una excusa. Una forma de recordarte, un día a la vez, todo lo que siento cuando estás cerca. Ábrelo sin prisa. No hay regalo que pueda competir con verte sonreír, pero prometo intentarlo.\n\nGracias por estar, por quedarte y por hacer que hasta los días más grises tengan algo de luz.`,
+        firma: "Tuyo, desde el primer día."
+      },
+      {
+        dia: 2,
+        tipo: "vale",
+        titulo: "Desayuno sin alarma",
+        texto: "Para una de esas mañanas en las que el mundo puede esperar. Tú te quedas en la cama; yo me encargo del resto.",
+        canje: "Un desayuno en la cama, bien calentito y hecho por mí.",
+        condiciones: "Canjeable cualquier mañana libre. Incluye café, tu plan favorito y cero prisa."
+      },
+      {
+        dia: 3,
+        tipo: "foto",
+        titulo: "Donde sea, contigo",
+        texto: "No necesito un paisaje perfecto ni una fecha señalada. Me basta con que estés tú para que cualquier lugar se convierta en mi favorito.",
+        foto: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1400&q=85",
+        pie: "El mundo entero, entre tus manos."
+      },
+      {
+        dia: 4,
+        tipo: "enlace",
+        titulo: "Nuestra banda sonora",
+        texto: "Hay canciones que no solo se escuchan: se sienten. Esta es una de ellas. Cada vez que suena, apareces tú.",
+        url: "https://www.youtube.com/watch?v=2Vv-BfVoq4g",
+        cancion: "Perfect · Ed Sheeran",
+        boton: "Escuchar nuestra canción",
+        nota: "Sube un poquito el volumen. Y piensa en mí."
+      },
+      {
+        dia: 5,
+        tipo: "carta",
+        titulo: "Las cosas que amo de ti",
+        texto: `Amo cómo te ríes cuando intentas no reírte. Amo tu forma de contar lo que te importa, con las manos y con los ojos. Amo que recuerdes detalles que yo creía que solo había vivido yo.\n\nAmo tus silencios, tus manías, tu ternura de domingo. Amo que seas refugio y aventura al mismo tiempo.\n\nNo te quiero por una sola cosa. Te quiero por todas, incluso por las que aún no conozco.`,
+        firma: "Siempre tuyo."
+      },
+      {
+        dia: 6,
+        tipo: "vale",
+        titulo: "Noche de cine a la carta",
+        texto: "Una manta, una peli y tú eligiendo todos los planes. Mi única condición es que te sientes cerca.",
+        canje: "Una noche de cine con palomitas y película elegida por ti.",
+        condiciones: "Incluye derecho a pausa para ir por postre. Las canciones de los créditos se bailan juntos."
+      },
+      {
+        dia: 7,
+        tipo: "foto",
+        titulo: "Nuestro pequeño invierno",
+        texto: "Las luces de diciembre siempre me han parecido bonitas, pero desde que las miro contigo me parecen otra cosa: me parecen casa.",
+        foto: "https://images.unsplash.com/photo-1513297887119-d46091b24bfa?auto=format&fit=crop&w=1400&q=85",
+        pie: "Luces, frío y tu mano."
+      },
+      {
+        dia: 8,
+        tipo: "enlace",
+        titulo: "Para los días grises",
+        texto: "Guarda esta canción para cualquier tarde en la que falte el sol. Y cuando suene, acuérdate de que siempre vas a tener a alguien dispuesto a hacerte un té y a quedarse contigo.",
+        url: "https://www.youtube.com/watch?v=lp-EO5I60KA",
+        cancion: "Thinking Out Loud · Ed Sheeran",
+        boton: "Poner esta canción",
+        nota: "Dale play y ven a buscarme."
+      },
+      {
+        dia: 9,
+        tipo: "carta",
+        titulo: "Mi lugar favorito",
+        texto: `He estado en sitios bonitos. He visto calles que parecían de película y cielos que no olvidaré. Pero ningún mapa me ha enseñado nunca un lugar tan bonito como tu abrazo.\n\nContigo hasta los lunes aprenden a ser domingo.\n\nY si algún día te pierdes, recuerda que tu sitio sigue estando aquí: entre mis brazos, siempre.`,
+        firma: "En ti me quedo."
+      },
+      {
+        dia: 10,
+        tipo: "vale",
+        titulo: "Veinte minutos de nada",
+        texto: "Para cuando la espalda diga basta y el día haya sido demasiado largo. Tú solo preocúpate de estar cómoda.",
+        canje: "Veinte minutos de masaje, sin interrupciones.",
+        condiciones: "Móviles en modo avión. Se permite cerrar los ojos y quedarse dormida. Repetible si surge efecto."
+      },
+      {
+        dia: 11,
+        tipo: "foto",
+        titulo: "La luz que traes",
+        texto: "Hay personas que entran en una habitación y cambian el ambiente entero. Tú haces eso con mi vida. Como estas luces: pequeñas, cálidas, imposibles de no mirar.",
+        foto: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=1400&q=85",
+        pie: "Tu risa, mi luz favorita."
+      },
+      {
+        dia: 12,
+        tipo: "carta",
+        titulo: "Las pequeñas cosas",
+        texto: `Me enamoré de ti de una manera rara: no solo en los momentos enormes, sino en los diminutos.\n\nEn cómo me miras cuando crees que no me doy cuenta. En tus mensajes de buenos días. En tu manera de coger mi mano cuando cruzamos la calle.\n\nLos grandes amores también se construyen de cosas pequeñas. Y contigo, hasta lo pequeño se vuelve inolvidable.`,
+        firma: "Con todo lo que tengo."
+      },
+      {
+        dia: 13,
+        tipo: "vale",
+        titulo: "Una cena, sin negociar",
+        texto: "Hoy mandas tú. Elige el sitio, el plato y el postre. Yo solo elijo seguir mirándote mientras decides.",
+        canje: "Una cena en tu restaurante favorito, con postre obligatorio.",
+        condiciones: "Sin mirar precios y sin discutir sobre dónde ir. Vale especial: elijo yo los planes de después."
+      },
+      {
+        dia: 14,
+        tipo: "foto",
+        titulo: "Flores para ti",
+        texto: "Estas flores no son las que te voy a regalar. Son solo el recuerdo de que, cada vez que pienso en algo bonito, termino pensando en ti.",
+        foto: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=85",
+        pie: "Porque contigo todo florece."
+      },
+      {
+        dia: 15,
+        tipo: "enlace",
+        titulo: "Nuestro primer baile",
+        texto: "No hace falta música ni una ocasión especial. Bastan tus brazos, un pasillo de casa y este estribillo para que todo lo demás desaparezca.",
+        url: "https://www.youtube.com/watch?v=450p7goxZqg",
+        cancion: "All of Me · John Legend",
+        boton: "Escuchar y bailar",
+        nota: "Este vale incluye un baile lento, cuando quieras."
+      },
+      {
+        dia: 16,
+        tipo: "carta",
+        titulo: "Cuando te pienso",
+        texto: `No sé muy bien cómo explicarlo, pero te pienso en mitad de las cosas más raras: cuando se enfría el café, cuando veo un perro paseando, cuando alguien dice tu nombre sin conocerte.\n\nMi cabeza siempre encuentra el camino de vuelta a ti.\n\nY la verdad es que no quiero que se le ocurra otra cosa.`,
+        firma: "Pensando en ti, siempre."
+      },
+      {
+        dia: 17,
+        tipo: "vale",
+        titulo: "Una tarde sin reloj",
+        texto: "Te regalo una tarde entera. Sin hora de vuelta, sin pendientes, sin mirar el móvil. Solo nosotros dos y lo que nos apetezca.",
+        canje: "Una tarde de plan libre, decidida entre los dos.",
+        condiciones: "Válida para perderse, pasear sin rumbo o no hacer absolutamente nada. Se recomienda empezar con un abrazo."
+      },
+      {
+        dia: 18,
+        tipo: "foto",
+        titulo: "Hasta donde lleguemos",
+        texto: "No sé cuántos lugares me quedan por conocer, pero sí sé con quién quiero verlos todos. Si el camino se pone difícil, me quedo con tu mano y sigo.",
+        foto: "https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1400&q=85",
+        pie: "A tu lado, cualquier paisaje es casa."
+      },
+      {
+        dia: 19,
+        tipo: "enlace",
+        titulo: "Canción de buenos días",
+        texto: "Esto no es solo una canción: es una promesa pequeña para cada mañana. La de seguir eligiéndote, incluso cuando aún no he abierto los ojos del todo.",
+        url: "https://www.youtube.com/watch?v=nSDgHBxUbVQ",
+        cancion: "Photograph · Ed Sheeran",
+        boton: "Escuchar conmigo",
+        nota: "Válida para despertarse cantando o bailando descalzos."
+      },
+      {
+        dia: 20,
+        tipo: "vale",
+        titulo: "Mimos de emergencia",
+        texto: "Para los días en los que necesites un extra de cariño. Sin preguntas, sin explicaciones y sin tener que pedirlo.",
+        canje: "Una sesión de mimos: abrazo largo, manta y mimos ilimitados.",
+        condiciones: "No caduca. Se puede canjear más de una vez si el día lo requiere. El abrazo mínimo son veinte segundos."
+      },
+      {
+        dia: 21,
+        tipo: "carta",
+        titulo: "Gracias",
+        texto: `Gracias por las risas que no esperaba, por las conversaciones que se alargan y por la paciencia que a veces no merezco.\n\nGracias por elegirme en los días fáciles y, sobre todo, por quedarte en los que no lo son.\n\nNo sé qué habré hecho para tenerte cerca, pero pienso cuidarlo todos los días de mi vida.`,
+        firma: "Gracias, mi amor."
+      },
+      {
+        dia: 22,
+        tipo: "vale",
+        titulo: "Una escapada de un día",
+        texto: "Para elegir un día, subirnos al coche y desaparecer hasta que se haga de noche. Sin destino concreto y con tu música favorita.",
+        canje: "Una escapada de un día con destino sorpresa.",
+        condiciones: "Tú pones la fecha; yo pongo el plan (acepto sugerencias secretas). Incluye parada obligatoria para café."
+      },
+      {
+        dia: 23,
+        tipo: "carta",
+        titulo: "Lo que viene",
+        texto: `Me gusta imaginar los diciembres que nos quedan: las casas que aún no hemos vivido, los perros que aún no hemos adoptado, las personas que aún no hemos sido.\n\nNo sé qué nos espera. Solo sé que espero que estés tú.\n\nY que, si no, vuelvo a empezar hasta encontrarte.`,
+        firma: "Quiero todos mis diciembres contigo."
+      },
+      {
+        dia: 24,
+        tipo: "carta",
+        titulo: "El último, y el más importante",
+        texto: `Llegaste al último día. Y aunque este calendario termina aquí, lo nuestro solo acaba de empezar.\n\nTodas las puertas de estos 24 días solo intentaban decirte una misma cosa: que te amo. Que te elijo. Que, si me dejas, quiero hacer de cada día de diciembre una excusa para cuidarte, escucharte y hacerte sonreír.\n\nGracias por ser mi lugar favorito. Feliz Navidad, mi amor.\n\nY ahora ven aquí: el mejor regalo es seguir abrazándote. ♥`,
+        firma: "Siempre tuyo, en este diciembre y en todos los que vengan."
+      }
+    ];
+
+    /* =========================================================
+       MOTOR DEL CALENDARIO · A partir de aquí no hace falta editar
+       ========================================================= */
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "calendario-amor-v1";
+      const $ = (selector, scope = document) => scope.querySelector(selector);
+      const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const grid = $("#calendarGrid");
+      const modalRoot = $("#modalRoot");
+      const modal = $("#modal");
+      const modalVisual = $("#modalVisual");
+      const modalKicker = $("#modalKicker");
+      const modalTitle = $("#modalTitle");
+      const modalBody = $("#modalBody");
+      const modalActions = $("#modalActions");
+      const favoriteBtn = $("#favoriteBtn");
+      const favoriteLabel = $("#favoriteLabel");
+      const toast = $("#toast");
+      const toastText = $("#toastText");
+      const previewToggle = $("#previewToggle");
+      const previewBanner = $("#previewBanner");
+      const resetProgressBtn = $("#resetProgress");
+      const celebrationLayer = $("#celebration");
+      const modalClose = $("#modalClose");
+
+      const TIPO_ETIQUETA = {
+        carta: "Carta de amor",
+        vale: "Vale canjeable",
+        foto: "Un recuerdo nuestro",
+        enlace: "Para escuchar juntos"
+      };
+
+      const TIPO_FRASE = {
+        carta: "Palabras para leer despacio.",
+        vale: "Un pequeño lujo para canjear.",
+        foto: "Un instante que quiero guardar.",
+        enlace: "Dale play y piénsame."
+      };
+
+      const ICONS = {
+        carta: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.8 6.6 8.2 6 8.2-6"/><path d="M12 13.8c.9-1.3 2.6-1 2.6.4 0 1.2-1.5 2.2-2.6 3-1.1-.8-2.6-1.8-2.6-3 0-1.4 1.7-1.7 2.6-.4Z"/></svg>`,
+        vale: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5V6.5h18v2a2.5 2.5 0 0 0 0 5v4H3v-4a2.5 2.5 0 0 0 0-5Z"/><path d="M14 8.5v1M14 12.2v1.1M14 16v.5" stroke-dasharray=".1 3.2"/></svg>`,
+        foto: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="8.4" cy="9.4" r="1.7"/><path d="m5.5 17 4.3-4.6 3.4 3 2.2-2.2 3.1 3.4"/></svg>`,
+        enlace: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17.5V6.2l10-2v11.3"/><circle cx="6.4" cy="17.8" r="2.7"/><circle cx="16.4" cy="15.8" r="2.7"/></svg>`
+      };
+
+      const ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>`;
+      const LOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg>`;
+      const STAR = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4c1.2 5.8 3.8 8.4 9.6 9.6-5.8 1.2-8.4 3.8-9.6 9.6-1.2-5.8-3.8-8.4-9.6-9.6 5.8-1.2 8.4-3.8 9.6-9.6Z"/></svg>`;
+      const HEART = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.8 3.9 13A5.5 5.5 0 0 1 12 5.7 5.5 5.5 0 0 1 20.1 13Z"/></svg>`;
+
+      const ahora = new Date();
+      const esDiciembre = ahora.getMonth() === 11;
+      const diaActual = ahora.getDate();
+      const inicioDiciembre = new Date(ahora.getFullYear(), 11, 1);
+
+      let modoPreview = false;
+      let ultimoFoco = null;
+      let toastTimer = null;
+      let resetTimer = null;
+      let resetArmado = false;
+      let storageDisponible = true;
+      let storageAvisado = false;
+
+      const estado = cargarEstado();
+      const abiertos = new Set(estado.abiertos);
+      const favoritos = new Set(estado.favoritos);
+      const canjeados = new Set(estado.canjeados);
+
+      function numeroDia(valor) {
+        return String(valor).padStart(2, "0");
+      }
+
+      function escaparHTML(valor = "") {
+        return String(valor)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function urlSegura(valor) {
+        try {
+          const url = new URL(valor, window.location.href);
+          return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+        } catch {
+          return "";
+        }
+      }
+
+      function cargarEstado() {
+        const vacio = { abiertos: [], favoritos: [], canjeados: [] };
+        try {
+          const bruto = localStorage.getItem(STORAGE_KEY);
+          if (!bruto) return vacio;
+          const datos = JSON.parse(bruto);
+          const limpiar = (lista) => Array.isArray(lista)
+            ? [...new Set(lista.map(Number).filter((n) => Number.isInteger(n) && n >= 1 && n <= 24))]
+            : [];
+          return {
+            abiertos: limpiar(datos?.abiertos),
+            favoritos: limpiar(datos?.favoritos),
+            canjeados: limpiar(datos?.canjeados)
+          };
+        } catch {
+          return vacio;
+        }
+      }
+
+      function guardarEstado() {
+        if (!storageDisponible) return;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            abiertos: [...abiertos],
+            favoritos: [...favoritos],
+            canjeados: [...canjeados]
+          }));
+        } catch {
+          storageDisponible = false;
+          if (!storageAvisado) {
+            storageAvisado = true;
+            mostrarToast("No encuentro el almacenamiento del navegador. Tus puertas se abrirán igual, pero no se recordarán al recargar.");
+          }
+        }
+      }
+
+      function estaDesbloqueado(dia) {
+        if (modoPreview) return true;
+        if (!esDiciembre) return false;
+        if (dia < diaActual) return true;
+        if (dia === diaActual) return ahora.getHours() >= Number(CONFIG.horaDesbloqueo || 0);
+        return false;
+      }
+
+      function actualizarEstadoPortada() {
+        const status = $("#heroStatus");
+        const texto = $("#heroStatusText");
+        status.classList.remove("is-live", "is-preview");
+        if (modoPreview) {
+          status.classList.add("is-preview");
+          texto.textContent = "Vista previa activa · Las 24 puertas están abiertas";
+          return;
+        }
+        if (!esDiciembre) {
+          texto.textContent = `La magia comienza el 1 de diciembre · Faltan ${diasHastaDiciembre()} días`;
+          return;
+        }
+        status.classList.add("is-live");
+        if (diaActual >= 24) {
+          texto.textContent = "Diciembre está completo · Todas las puertas son tuyas";
+        } else {
+          texto.textContent = `Hoy es ${diaActual} de diciembre · La puerta de hoy te espera`;
+        }
+      }
+
+      function diasHastaDiciembre() {
+        const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+        const diferencia = Math.ceil((inicioDiciembre - hoy) / 86400000);
+        if (diferencia > 0) return diferencia;
+        const siguiente = new Date(ahora.getFullYear() + 1, 11, 1);
+        return Math.ceil((siguiente - hoy) / 86400000);
+      }
+
+      function actualizarProgreso() {
+        const total = abiertos.size;
+        $("#openedCount").textContent = total;
+        $("#progressFill").style.width = `${(total / 24) * 100}%`;
+        $("#progressBar").setAttribute("aria-valuenow", total);
+        const caption = $("#progressCaption");
+        if (total === 0) caption.textContent = "Hay 24 pequeños planes esperándote";
+        else if (total === 24) caption.textContent = "Las 24 puertas son ya parte de nosotros";
+        else if (total === 1) caption.textContent = "Un secreto menos por descubrir";
+        else caption.textContent = `${24 - total} secretos te siguen esperando`;
+      }
+
+      function estadoCarta(dia) {
+        const abierta = abiertos.has(dia);
+        const desbloqueada = estaDesbloqueado(dia);
+        return {
+          abierta,
+          desbloqueada,
+          esHoy: esDiciembre && dia === diaActual && !modoPreview && !abierta
+        };
+      }
+
+      function etiquetaAccesible(dia, desbloqueada, abierta) {
+        if (abierta) return `Día ${dia}, ya descubierto. Abrir de nuevo esta sorpresa.`;
+        if (desbloqueada) return `Abrir la sorpresa del día ${dia}.`;
+        return `Día ${dia}, todavía bloqueado. Se abre el ${dia} de diciembre.`;
+      }
+
+      function renderizarCalendario(conAnimacion = true) {
+        const fragmento = document.createDocumentFragment();
+        sorpresas.forEach((sorpresa, indice) => {
+          const dia = Number(sorpresa.dia);
+          const { abierta, desbloqueada, esHoy } = estadoCarta(dia);
+          const boton = document.createElement("button");
+          boton.type = "button";
+          boton.className = [
+            "door",
+            abierta ? "is-open" : "",
+            desbloqueada ? "is-unlocked" : "is-locked",
+            esHoy ? "is-today" : ""
+          ].filter(Boolean).join(" ");
+          boton.dataset.day = String(dia);
+          boton.style.setProperty("--i", String(indice));
+          boton.setAttribute("aria-label", etiquetaAccesible(dia, desbloqueada, abierta));
+
+          const iconoFavorito = favoritos.has(dia) ? `<span class="door__back-fav" aria-hidden="true">${HEART}</span>` : "";
+          const hint = desbloqueada
+            ? `${abierta ? "Volver a leer" : "Abrir"} ${ARROW}`
+            : `${LOCK} Pronto`;
+          boton.innerHTML = `
+            <span class="door__inner">
+              <span class="door__face door__front" aria-hidden="true">
+                <span class="door__star">${STAR}</span>
+                <span class="door__month">Diciembre</span>
+                <span class="door__number">${numeroDia(dia)}</span>
+                <span class="door__divider"><span></span><i></i><span></span></span>
+                <span class="door__hint">${hint}</span>
+              </span>
+              <span class="door__face door__back" aria-hidden="true">
+                ${iconoFavorito}
+                <span class="door__back-kicker">Diciembre</span>
+                <span class="door__back-icon">${ICONS[sorpresa.tipo] || ICONS.carta}</span>
+                <span class="door__back-day">${numeroDia(dia)}</span>
+                <span class="door__back-status">Descubierto</span>
+                <span class="door__back-hint">${ARROW} Volver a abrir</span>
+              </span>
+            </span>`;
+          fragmento.appendChild(boton);
+        });
+
+        grid.innerHTML = "";
+        grid.appendChild(fragmento);
+        grid.classList.toggle("no-intro", !conAnimacion);
+        actualizarProgreso();
+      }
+
+      function mostrarToast(mensaje, duracion = 3800) {
+        window.clearTimeout(toastTimer);
+        toastText.textContent = mensaje;
+        toast.classList.add("is-visible");
+        toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), duracion);
+      }
+
+      function mensajeBloqueo(dia) {
+        if (!esDiciembre) {
+          return "Todavía no, amor. La magia empieza el 1 de diciembre ❤�E�E;
+        }
+        return `Todavía no, amor. Espera al día ${dia}: te guardo una sorpresa muy bonita ❤�E�`;
+      }
+
+      function aplicarModoPreview(activo) {
+        modoPreview = activo;
+        previewToggle.setAttribute("aria-checked", String(activo));
+        previewBanner.hidden = !activo;
+        document.body.classList.toggle("preview-mode", activo);
+        actualizarEstadoPortada();
+        renderizarCalendario(false);
+        if (activo) {
+          mostrarToast("Vista previa activada. Ya puedes abrir cualquier día. Recuerda reiniciar el progreso antes de regalarlo.");
+        } else {
+          resetArmado = false;
+          window.clearTimeout(resetTimer);
+          resetProgressBtn.classList.remove("is-armed");
+          resetProgressBtn.textContent = "Reiniciar progreso";
+          mostrarToast("Vista previa desactivada. Vuelves a ver el calendario con las fechas reales.");
+        }
+      }
+
+      // =======================================================
+      //  MODAL Y SORPRESAS
+      // =======================================================
+      let diaActivo = null;
+      let sorpresaActiva = null;
+      let ultimoFocoDia = null;
+      let temporizadorCierre = null;
+      let temporizadorApertura = null;
+
+      function parrafosHTML(texto = "") {
+        return String(texto)
+          .trim()
+          .split(/\n{2,}/)
+          .map((parrafo, indice) => `<p${indice === 0 ? ' class="letter-opener"' : ""}>${escaparHTML(parrafo).replaceAll("\n", "<br>")}</p>`)
+          .join("");
+      }
+
+      function crearVisual(sorpresa, dia) {
+        modalVisual.removeAttribute("data-kind");
+        if (sorpresa.tipo === "foto") {
+          modalVisual.dataset.kind = "foto";
+          const foto = urlSegura(sorpresa.foto || "");
+          const alt = escaparHTML(sorpresa.pie || sorpresa.titulo || `Recuerdo del día ${dia}`);
+          modalVisual.innerHTML = `
+            <div class="visual__photo-fallback ${foto ? "" : "is-visible"}" id="photoFallback">
+              ${ICONS.foto}
+            </div>
+            ${foto ? `<img class="visual__photo" id="visualPhoto" src="${escaparHTML(foto)}" alt="${alt}" loading="eager" referrerpolicy="no-referrer">` : ""}
+            <div class="visual__photo-shade"></div>
+            <div class="visual__top">
+              <span>Día ${numeroDia(dia)}</span>
+              <span class="visual__top-line"></span>
+              <span>Diciembre</span>
+            </div>
+            <div class="visual__bottom">
+              <p class="visual__caption">${escaparHTML(sorpresa.pie || "Un recuerdo nuestro.")}</p>
+              <span>Un instante</span>
+            </div>`;
+          const fotoEl = $("#visualPhoto", modalVisual);
+          if (fotoEl) {
+            fotoEl.addEventListener("error", () => {
+              fotoEl.remove();
+              $("#photoFallback", modalVisual)?.classList.add("is-visible");
+            }, { once: true });
+          }
+          return;
+        }
+
+        modalVisual.dataset.kind = sorpresa.tipo;
+        modalVisual.innerHTML = `
+          <div class="visual__top">
+            <span>Día ${numeroDia(dia)}</span>
+            <span class="visual__top-line"></span>
+            <span>Diciembre</span>
+          </div>
+          <div class="visual__center">
+            <span class="visual__ghost">${numeroDia(dia)}</span>
+            <span class="visual__icon">${ICONS[sorpresa.tipo] || ICONS.carta}</span>
+            <span class="visual__kind">${escaparHTML(TIPO_ETIQUETA[sorpresa.tipo] || "Con amor")}</span>
+            <p class="visual__quote">${escaparHTML(TIPO_FRASE[sorpresa.tipo] || "Hecho para ti.")}</p>
+          </div>
+          <div class="visual__bottom">
+            <span>Un regalo para ti</span>
+            <span>${numeroDia(dia)} / 24</span>
+          </div>`;
+      }
+
+      function crearCuerpo(sorpresa, dia) {
+        let html = parrafosHTML(sorpresa.texto || "Me quedé sin palabras, pero no sin ganas de quererte.");
+
+        if (sorpresa.tipo === "carta" && sorpresa.firma) {
+          html += `<p class="letter-signature">${escaparHTML(sorpresa.firma)}</p>`;
+        }
+
+        if (sorpresa.tipo === "vale") {
+          html += `
+            <div class="voucher">
+              <div class="voucher__head"><span>Vale de amor</span><span>N.º ${numeroDia(dia)}</span></div>
+              <span class="voucher__label">Canjeable por</span>
+              <strong class="voucher__main">${escaparHTML(sorpresa.canje || sorpresa.titulo || "Un momento juntos")}</strong>
+              <span class="voucher__conditions">${escaparHTML(sorpresa.condiciones || "Sin fecha de caducidad. Solo tienes que sonreír y pedirlo.")}</span>
+            </div>`;
+        }
+
+        if (sorpresa.tipo === "foto") {
+          html += `
+            <div class="photo-meta">
+              ${ICONS.foto}
+              <span>${escaparHTML(sorpresa.pie || "Un recuerdo elegido para ti")}</span>
+            </div>`;
+        }
+
+        if (sorpresa.tipo === "enlace") {
+          html += `
+            <div class="song-card">
+              <span class="song-card__disc" aria-hidden="true"></span>
+              <span class="song-card__copy">
+                <span class="song-card__label">Ahora suena</span>
+                <span class="song-card__title">${escaparHTML(sorpresa.cancion || "Una canción para nosotros")}</span>
+              </span>
+            </div>`;
+        }
+
+        return html;
+      }
+
+      function crearAcciones(sorpresa, dia) {
+        modalActions.innerHTML = "";
+        if (sorpresa.tipo === "vale") {
+          const yaCanjeado = canjeados.has(dia);
+          const boton = document.createElement("button");
+          boton.type = "button";
+          boton.className = `btn ${yaCanjeado ? "btn--redeemed" : "btn--primary"}`;
+          boton.dataset.redeem = String(dia);
+          boton.disabled = yaCanjeado;
+          boton.innerHTML = yaCanjeado
+            ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg> Vale canjeado con amor`
+            : `Canjear este vale ${STAR}`;
+          modalActions.appendChild(boton);
+
+          const nota = document.createElement("p");
+          nota.className = "action-note";
+          nota.textContent = yaCanjeado
+            ? "Ya es tuyo. Prometo cumplirlo cuando lo pidas."
+            : "Guarda este vale como recuerdo. Yo me encargo de hacerlo realidad.";
+          modalActions.appendChild(nota);
+          return;
+        }
+
+        if (sorpresa.tipo === "enlace") {
+          const enlace = urlSegura(sorpresa.url || "");
+          if (enlace) {
+            const link = document.createElement("a");
+            link.className = "btn btn--link";
+            link.href = enlace;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m10 8.5 5 3.5-5 3.5Z" fill="currentColor" stroke="none"/></svg> ${escaparHTML(sorpresa.boton || "Escuchar ahora")}`;
+            modalActions.appendChild(link);
+            const nota = document.createElement("p");
+            nota.className = "action-note";
+            nota.textContent = sorpresa.nota || "Se abre en una pestaña nueva.";
+            modalActions.appendChild(nota);
+          } else {
+            const aviso = document.createElement("p");
+            aviso.className = "action-note";
+            aviso.textContent = "Este enlace está pendiente de añadir.";
+            modalActions.appendChild(aviso);
+          }
+        }
+      }
+
+      function actualizarFavorito() {
+        if (diaActivo === null) return;
+        const activo = favoritos.has(diaActivo);
+        favoriteBtn.setAttribute("aria-pressed", String(activo));
+        favoriteLabel.textContent = activo ? "Guardado en favoritos" : "Guardar en favoritos";
+      }
+
+      function rellenarModal(dia) {
+        const sorpresa = sorpresas.find((item) => Number(item.dia) === dia);
+        if (!sorpresa) return;
+        diaActivo = dia;
+        sorpresaActiva = sorpresa;
+        const tipo = sorpresa.tipo || "carta";
+        modalKicker.innerHTML = `<span class="modal__kicker-line" aria-hidden="true"></span> Día ${numeroDia(dia)} · ${escaparHTML(TIPO_ETIQUETA[tipo] || "Sorpresa")}`;
+        modalTitle.textContent = sorpresa.titulo || `Sorpresa del día ${dia}`;
+        modalBody.innerHTML = crearCuerpo({ ...sorpresa, tipo }, dia);
+        crearVisual({ ...sorpresa, tipo }, dia);
+        crearAcciones({ ...sorpresa, tipo }, dia);
+        actualizarFavorito();
+        $(".modal__content").scrollTop = 0;
+      }
+
+      function bloquearScroll(bloquear) {
+        const contenido = $("#pageContent");
+        if (bloquear) {
+          const anchoBarra = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+          document.body.classList.add("modal-open");
+          document.body.style.paddingRight = anchoBarra ? `${anchoBarra}px` : "";
+          contenido.inert = true;
+        } else {
+          document.body.classList.remove("modal-open");
+          document.body.style.paddingRight = "";
+          contenido.inert = false;
+        }
+      }
+
+      function abrirModal(dia, opciones = {}) {
+        window.clearTimeout(temporizadorCierre);
+        window.clearTimeout(temporizadorApertura);
+        const { trigger = document.activeElement, celebrar = false, origen = null } = opciones;
+        ultimoFocoDia = trigger instanceof HTMLElement && trigger.dataset.day
+          ? Number(trigger.dataset.day)
+          : dia;
+        rellenarModal(dia);
+        bloquearScroll(true);
+        modalRoot.hidden = false;
+        requestAnimationFrame(() => {
+          modalRoot.classList.add("is-visible");
+        });
+        window.setTimeout(() => modalClose.focus({ preventScroll: true }), 80);
+        if (celebrar) {
+          window.setTimeout(() => {
+            const rect = modal.getBoundingClientRect();
+            lanzarCorazones({
+              x: origen?.x ?? rect.left + rect.width * .22,
+              y: origen?.y ?? rect.top + rect.height * .34,
+              cantidad: 26
+            });
+          }, reducedMotion.matches ? 0 : 220);
+        }
+      }
+
+      function cerrarModal() {
+        if (modalRoot.hidden || !modalRoot.classList.contains("is-visible")) return;
+        modalRoot.classList.remove("is-visible");
+        bloquearScroll(false);
+        window.clearTimeout(temporizadorCierre);
+        temporizadorCierre = window.setTimeout(() => {
+          modalRoot.hidden = true;
+          diaActivo = null;
+          sorpresaActiva = null;
+          if (ultimoFocoDia !== null) {
+            const puerta = grid.querySelector(`[data-day="${ultimoFocoDia}"]`);
+            puerta?.focus({ preventScroll: true });
+          }
+        }, reducedMotion.matches ? 0 : 330);
+      }
+
+      function enfocarDentroModal(evento) {
+        if (evento.key !== "Tab" || modalRoot.hidden) return;
+        const enfocables = $$('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])', modal)
+          .filter((elemento) => elemento.offsetWidth > 0 || elemento.offsetHeight > 0);
+        if (!enfocables.length) return;
+        const primero = enfocables[0];
+        const ultimo = enfocables[enfocables.length - 1];
+        if (evento.shiftKey && (document.activeElement === primero || document.activeElement === modal)) {
+          evento.preventDefault();
+          ultimo.focus();
+        } else if (!evento.shiftKey && document.activeElement === ultimo) {
+          evento.preventDefault();
+          primero.focus();
+        }
+      }
+
+      function lanzarCorazones({ x = window.innerWidth / 2, y = window.innerHeight * .6, cantidad = 20 } = {}) {
+        if (reducedMotion.matches) return;
+        const colores = ["#d7b579", "#f0ddb8", "#d88f8f", "#f3c7b5", "#e8cd9e", "#b46b76"];
+        const simbolos = ["♥", "♥", "♥", "✦", "♥"];
+        for (let i = 0; i < cantidad; i += 1) {
+          const corazon = document.createElement("span");
+          const duracion = 1.25 + Math.random() * 1.15;
+          const retraso = Math.random() * .28;
+          corazon.className = "floating-heart";
+          corazon.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+          corazon.style.left = `${x + (Math.random() - .5) * 50}px`;
+          corazon.style.top = `${y + (Math.random() - .5) * 30}px`;
+          corazon.style.fontSize = `${9 + Math.random() * 17}px`;
+          corazon.style.color = colores[Math.floor(Math.random() * colores.length)];
+          corazon.style.setProperty("--dx", `${(Math.random() - .5) * 330}px`);
+          corazon.style.setProperty("--dy", `${-90 - Math.random() * 330}px`);
+          corazon.style.setProperty("--rot", `${(Math.random() - .5) * 110}deg`);
+          corazon.style.setProperty("--scale", `${.8 + Math.random() * 1.5}`);
+          corazon.style.setProperty("--duration", `${duracion}s`);
+          corazon.style.setProperty("--delay", `${retraso}s`);
+          corazon.style.setProperty("--opacity", `${.55 + Math.random() * .45}`);
+          celebrationLayer.appendChild(corazon);
+          window.setTimeout(() => corazon.remove(), (duracion + retraso) * 1000 + 100);
+        }
+      }
+
+      // =======================================================
+      //  EVENTOS
+      // =======================================================
+      grid.addEventListener("click", (evento) => {
+        const puerta = evento.target.closest(".door");
+        if (!puerta) return;
+        const dia = Number(puerta.dataset.day);
+
+        if (!estaDesbloqueado(dia)) {
+          puerta.classList.remove("is-shaking");
+          void puerta.offsetWidth;
+          puerta.classList.add("is-shaking");
+          window.setTimeout(() => puerta.classList.remove("is-shaking"), 520);
+          mostrarToast(mensajeBloqueo(dia));
+          return;
+        }
+
+        if (puerta.classList.contains("is-busy")) return;
+        const yaAbierta = abiertos.has(dia);
+        const rect = puerta.getBoundingClientRect();
+        const origen = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+
+        if (!yaAbierta) {
+          abiertos.add(dia);
+          guardarEstado();
+          puerta.classList.add("is-open", "is-busy");
+          puerta.classList.remove("is-today", "is-locked");
+          puerta.classList.add("is-unlocked");
+          puerta.setAttribute("aria-label", etiquetaAccesible(dia, true, true));
+          actualizarProgreso();
+          window.clearTimeout(temporizadorApertura);
+          temporizadorApertura = window.setTimeout(() => {
+            puerta.classList.remove("is-busy");
+            abrirModal(dia, { trigger: puerta, celebrar: true, origen });
+          }, reducedMotion.matches ? 0 : 650);
+          return;
+        }
+
+        abrirModal(dia, { trigger: puerta, celebrar: false, origen });
+      });
+
+      previewToggle.addEventListener("click", () => {
+        aplicarModoPreview(!modoPreview);
+      });
+
+      resetProgressBtn.addEventListener("click", () => {
+        if (!resetArmado) {
+          resetArmado = true;
+          resetProgressBtn.classList.add("is-armed");
+          resetProgressBtn.textContent = "¿Seguro? Toca otra vez";
+          mostrarToast("Toca de nuevo para borrar las puertas abiertas, los favoritos y los vales canjeados. Esta acción no se puede deshacer.");
+          window.clearTimeout(resetTimer);
+          resetTimer = window.setTimeout(() => {
+            resetArmado = false;
+            resetProgressBtn.classList.remove("is-armed");
+            resetProgressBtn.textContent = "Reiniciar progreso";
+          }, 5000);
+          return;
+        }
+
+        window.clearTimeout(resetTimer);
+        abiertos.clear();
+        favoritos.clear();
+        canjeados.clear();
+        try { localStorage.removeItem(STORAGE_KEY); } catch { /* La memoria de la sesión ya está limpia. */ }
+        resetArmado = false;
+        resetProgressBtn.classList.remove("is-armed");
+        resetProgressBtn.textContent = "Reiniciar progreso";
+        renderizarCalendario(false);
+        mostrarToast("Todo listo. El calendario vuelve a estar cerrado y brillante para ella ✨");
+      });
+
+      modalClose.addEventListener("click", cerrarModal);
+      $(".modal__backdrop", modalRoot).addEventListener("click", cerrarModal);
+      modalRoot.addEventListener("keydown", (evento) => {
+        enfocarDentroModal(evento);
+        if (evento.key === "Escape") {
+          evento.preventDefault();
+          cerrarModal();
+        }
+      });
+      document.addEventListener("keydown", (evento) => {
+        if (evento.key === "Escape" && !modalRoot.hidden) cerrarModal();
+      });
+
+      favoriteBtn.addEventListener("click", () => {
+        if (diaActivo === null) return;
+        if (favoritos.has(diaActivo)) {
+          favoritos.delete(diaActivo);
+          mostrarToast(`Día ${diaActivo} quitado de tus favoritos.`);
+        } else {
+          favoritos.add(diaActivo);
+          const rect = favoriteBtn.getBoundingClientRect();
+          lanzarCorazones({ x: rect.left + rect.width / 2, y: rect.top, cantidad: 9 });
+        }
+        guardarEstado();
+        actualizarFavorito();
+        renderizarCalendario(false);
+      });
+
+      modalActions.addEventListener("click", (evento) => {
+        const boton = evento.target.closest("[data-redeem]");
+        if (!boton || diaActivo === null || canjeados.has(diaActivo)) return;
+        canjeados.add(diaActivo);
+        guardarEstado();
+        boton.disabled = true;
+        boton.className = "btn btn--redeemed";
+        boton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg> Vale canjeado con amor`;
+        const nota = $(".action-note", modalActions);
+        if (nota) nota.textContent = "Ya es tuyo. Prometo cumplirlo cuando lo pidas.";
+        const rect = boton.getBoundingClientRect();
+        lanzarCorazones({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, cantidad: 22 });
+        mostrarToast(`Día ${diaActivo}: vale canjeado. Ahora solo falta que lo disfrutemos juntos 💛`);
+      });
+
+      // =======================================================
+      //  NIEVE SUAVE
+      // =======================================================
+      function iniciarNieve() {
+        const canvas = $("#snow");
+        if (!canvas || reducedMotion.matches) return;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        let ancho = 0;
+        let alto = 0;
+        let copos = [];
+        let raf = null;
+        let ultimoTiempo = 0;
+
+        const crearCopos = () => {
+          const cantidad = Math.min(95, Math.max(34, Math.round(ancho / 15)));
+          copos = Array.from({ length: cantidad }, () => ({
+            x: Math.random() * ancho,
+            y: Math.random() * alto,
+            radio: .5 + Math.random() * 2.2,
+            velocidad: .12 + Math.random() * .46,
+            deriva: (Math.random() - .5) * .26,
+            fase: Math.random() * Math.PI * 2,
+            alfa: .2 + Math.random() * .55,
+            dorado: Math.random() < .11
+          }));
+        };
+
+        const ajustar = () => {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          ancho = window.innerWidth;
+          alto = window.innerHeight;
+          canvas.width = Math.round(ancho * dpr);
+          canvas.height = Math.round(alto * dpr);
+          canvas.style.width = `${ancho}px`;
+          canvas.style.height = `${alto}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          crearCopos();
+        };
+
+        const dibujar = (tiempo) => {
+          if (!ultimoTiempo) ultimoTiempo = tiempo;
+          const delta = Math.min(tiempo - ultimoTiempo, 48);
+          ultimoTiempo = tiempo;
+          ctx.clearRect(0, 0, ancho, alto);
+          copos.forEach((copo) => {
+            copo.y += copo.velocidad * (delta / 16);
+            copo.x += (copo.deriva + Math.sin(copo.fase + tiempo * .0005) * .11) * (delta / 16);
+            if (copo.y > alto + 8) {
+              copo.y = -8;
+              copo.x = Math.random() * ancho;
+            }
+            if (copo.x < -10) copo.x = ancho + 10;
+            if (copo.x > ancho + 10) copo.x = -10;
+            ctx.beginPath();
+            ctx.fillStyle = copo.dorado
+              ? `rgba(231, 199, 142, ${copo.alfa * .8})`
+              : `rgba(255, 250, 240, ${copo.alfa})`;
+            ctx.arc(copo.x, copo.y, copo.radio, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          raf = requestAnimationFrame(dibujar);
+        };
+
+        const iniciar = () => {
+          cancelAnimationFrame(raf);
+          ultimoTiempo = 0;
+          raf = requestAnimationFrame(dibujar);
+        };
+
+        ajustar();
+        iniciar();
+        let espera;
+        window.addEventListener("resize", () => {
+          window.clearTimeout(espera);
+          espera = window.setTimeout(ajustar, 150);
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) {
+            cancelAnimationFrame(raf);
+            raf = null;
+          } else if (!raf) {
+            iniciar();
+          }
+        });
+      }
+
+      // =======================================================
+      //  ARRANQUE
+      // =======================================================
+      function iniciar() {
+        $("#heroYear").textContent = CONFIG.anio;
+        $("#footerYear").textContent = CONFIG.anio;
+        $(".site-footer").innerHTML = `Hecho con <span class="site-footer__heart" aria-label="amor">♥</span> para ${escaparHTML(CONFIG.para)} · Diciembre ${escaparHTML(CONFIG.anio)}`;
+        $(".modal__signature").textContent = `${CONFIG.remitente} · ♥`;
+        actualizarEstadoPortada();
+        renderizarCalendario(true);
+        iniciarNieve();
+      }
+
+      iniciar();
+    })();
+  </script>
+<script>
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const door = document.querySelector('.door');
+    const front = document.querySelector('.door__front');
+    const style = getComputedStyle(door);
+    const fs = getComputedStyle(front);
+    const d = door.getBoundingClientRect();
+    const f = front.getBoundingClientRect();
+    const g = document.querySelector('.calendar-grid').getBoundingClientRect();
+    const out = {innerWidth,innerHeight, devicePixelRatio, dpr:window.devicePixelRatio, scrollY, door:{x:d.x,y:d.y,w:d.width,h:d.height}, front:{x:f.x,y:f.y,w:f.width,h:f.height}, grid:{x:g.x,y:g.y,w:g.width,h:g.height}, gridCols:getComputedStyle(document.querySelector('.calendar-grid')).gridTemplateColumns, doorStyle:{width:style.width,height:style.height,transform:style.transform,animation:style.animationName,opacity:style.opacity}, frontStyle:{width:fs.width,padding:fs.padding,fontSize:fs.fontSize}};
+    const pre = document.createElement('pre'); pre.id='diagnostico'; pre.textContent=JSON.stringify(out,null,2); document.body.appendChild(pre);
+  }, 3000);
+});
+</script>
+</body>
+</html>
